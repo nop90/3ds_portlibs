@@ -32,7 +32,13 @@ Currently supports the following portlibs:
 * mbedtls (requires zlib) (without net component)
 * sqlite
 * tinyxml2
-* tremor - low mwmory branch (requires libogg)
+* tremor - low memory branch (requires libogg)
 * xz
 * libmikmod
 * zlib
+* SDL_ttf (requires SDL to be installed)
+* SDL_image (requires SDL to be installed)
+* SDL_mixer (requires SDL to be installed)
+* SDL_net (requires SDL to be installed)
+* SDL_gfx (requires SDL to be installed)
+* SDL_sound (requires SDL to be installed)

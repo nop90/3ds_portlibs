@@ -90,6 +90,36 @@ ZLIB_VERSION          := $(ZLIB)-1.2.8
 ZLIB_SRC              := $(ZLIB_VERSION).tar.gz
 ZLIB_DOWNLOAD         := http://prdownloads.sourceforge.net/libpng/zlib-1.2.8.tar.gz?download
 
+SDL_TTF               := SDL_ttf
+SDL_TTF_VERSION       := $(SDL_TTF)-2.0.11
+SDL_TTF_SRC           := $(SDL_TTF_VERSION).tar.gz
+SDL_TTF_DOWNLOAD      := http://www.libsdl.org/projects/SDL_ttf/release/SDL_ttf-2.0.11.tar.gz
+
+SDL_IMAGE             := SDL_image
+SDL_IMAGE_VERSION     := $(SDL_IMAGE)-1.2.12
+SDL_IMAGE_SRC         := $(SDL_IMAGE_VERSION).tar.gz
+SDL_IMAGE_DOWNLOAD    := "http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz"
+
+SDL_MIXER             := SDL_mixer
+SDL_MIXER_VERSION     := $(SDL_MIXER)-1.2.12
+SDL_MIXER_SRC         := $(SDL_MIXER_VERSION).tar.gz
+SDL_MIXER_DOWNLOAD    := "http://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-1.2.12.tar.gz"
+
+SDL_NET               := SDL_net
+SDL_NET_VERSION       := $(SDL_NET)-1.2.8
+SDL_NET_SRC           := $(SDL_NET_VERSION).tar.gz
+SDL_NET_DOWNLOAD      := "http://www.libsdl.org/projects/SDL_net/release/SDL_net-1.2.8.tar.gz"
+
+SDL_GFX               := SDL_gfx
+SDL_GFX_VERSION       := $(SDL_GFX)-2.0.25
+SDL_GFX_SRC           := $(SDL_GFX_VERSION).tar.gz
+SDL_GFX_DOWNLOAD      := "https://sourceforge.net/projects/sdlgfx/files/SDL_gfx-2.0.25.tar.gz/download"
+
+SDL_SOUND             := SDL_sound
+SDL_SOUND_VERSION     := $(SDL_SOUND)-1.0.3
+SDL_SOUND_SRC         := $(SDL_SOUND_VERSION).tar.gz
+SDL_SOUND_DOWNLOAD    := "https://www.icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz"
+
 export PORTLIBS_PATH  := $(DEVKITPRO)/portlibs
 export PATH           := $(DEVKITARM)/bin:$(PORTLIBS_PATH)/3ds/bin:$(PORTLIBS_PATH)/armv6k/bin:$(PATH)
 export PKG_CONFIG     := $(PWD)/arm-none-eabi-pkg-config
@@ -124,7 +154,13 @@ export LIBS           := -lctru
         $(TREMOR) \
         $(XZ) \
         $(MIKMOD) \
-        $(ZLIB)
+        $(ZLIB) \
+        $(SDL_TTF) \
+        $(SDL_MIXER) \
+        $(SDL_IMAGE) \
+        $(SDL_NET) \
+        $(SDL_GFX) \
+        $(SDL_SOUND) 
 
 all:
 	@echo "Please choose one of the following targets:"
@@ -146,8 +182,16 @@ all:
 	@echo "  $(XZ)"
 	@echo "  $(MIKMOD)"
 	@echo "  $(ZLIB)"
+	@echo "  $(SDL_TTF) (requires SDL to be installed)"
+	@echo "  $(SDL_MIXER) (requires SDL to be installed)"
+	@echo "  $(SDL_IMAGE) (requires SDL to be installed)"
+	@echo "  $(SDL_NET) (requires SDL to be installed)"
+	@echo "  $(SDL_GFX) (requires SDL to be installed)"
+	@echo "  $(SDL_SOUND) (requires SDL to be installed)"
 
-download: $(BZIP2_SRC) $(FREETYPE_SRC) $(GIFLIB_SRC) $(JANSSON_SRC) $(LIBCONFIG_SRC) $(LIBEXIF_SRC) $(LIBJPEGTURBO_SRC) $(LIBMAD_SRC) $(LIBOGG_SRC) $(LIBPNG_SRC) $(LIBXMP_LITE_SRC) $(MBED_APACHE_SRC) $(MBED_GPL_SRC) $(TINYXML_SRC) $(TREMOR_SRC) $(XZ_SRC) $(MIKMOD_SRC) $(ZLIB_SRC)
+download: $(BZIP2_SRC)  $(FREETYPE_SRC) $(GIFLIB_SRC) $(JANSSON_SRC) $(LIBCONFIG_SRC) $(LIBEXIF_SRC) $(LIBJPEGTURBO_SRC) $(LIBMAD_SRC) $(LIBOGG_SRC) \
+						$(LIBPNG_SRC) $(LIBXMP_LITE_SRC) $(MBED_APACHE_SRC) $(MBED_GPL_SRC) $(TINYXML_SRC) $(TREMOR_SRC) $(XZ_SRC) $(MIKMOD_SRC) $(ZLIB_SRC) \
+						$(SDL_TTF_SRC) $(SDL_IMAGE_SRC) $(SDL_MIXER_SRC) $(SDL_NET_SRC) $(SDL_GFX_SRC) $(SDL_SOUND_SRC)
 
 DOWNLOAD = wget --no-check-certificate -O "$(1)" "$(2)" || curl -Lo "$(1)" "$(2)"
 
@@ -204,6 +248,25 @@ $(MIKMOD_SRC):
 
 $(ZLIB_SRC):
 	@$(call DOWNLOAD,$@,$(ZLIB_DOWNLOAD))
+
+$(SDL_TTF_SRC):
+	$(call DOWNLOAD,$@,$(SDL_TTF_DOWNLOAD))
+	
+$(SDL_IMAGE_SRC):
+	$(call DOWNLOAD,$@,$(SDL_IMAGE_DOWNLOAD))
+    
+$(SDL_MIXER_SRC):
+	$(call DOWNLOAD,$@,$(SDL_MIXER_DOWNLOAD))
+
+$(SDL_NET_SRC):
+	$(call DOWNLOAD,$@,$(SDL_NET_DOWNLOAD))
+
+$(SDL_GFX_SRC):
+	$(call DOWNLOAD,$@,$(SDL_GFX_DOWNLOAD))
+
+$(SDL_SOUND_SRC):
+	$(call DOWNLOAD,$@,$(SDL_SOUND_DOWNLOAD))
+
 
 $(BZIP2): $(BZIP2_SRC)
 	@[ -d $(BZIP2_VERSION) ] || tar -xzf $<
@@ -325,6 +388,53 @@ $(ZLIB): $(ZLIB_SRC)
 	 CHOST=arm-none-eabi ./configure --static --prefix=$(PORTLIBS_PATH)/armv6k
 	@$(MAKE) -C $(ZLIB_VERSION)
 
+$(SDL_TTF): $(SDL_TTF_SRC)
+	@[ -d $(SDL_TTF_VERSION) ] || tar -xzf $<
+	@cd $(SDL_TTF_VERSION) && \
+	 ./autogen.sh &&\
+	 ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static
+	@$(MAKE) -C $(SDL_TTF_VERSION)
+
+$(SDL_IMAGE): $(SDL_IMAGE_SRC)
+	@[ -d $(SDL_IMAGE_VERSION) ] || tar -xzf $<
+	@cd $(SDL_IMAGE_VERSION) && \
+	 cp ../SDL_image_Makefile Makefile
+#	 ./autogen.sh && \
+#	 ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static \	
+#	 --enable-bmp --enable-gif --enable-lbm --enable-pcx --enable-pnm --enable-tga --enable-xcf --enable-xpm --enable-xv --enable-jpg --enable-png
+	@$(MAKE) -C $(SDL_IMAGE_VERSION)
+        
+$(SDL_MIXER): $(SDL_MIXER_SRC)
+	@[ -d $(SDL_MIXER_VERSION) ] || tar --exclude=SDL_mixer-1.2.12/Xcode -xzf $< 
+	@cd $(SDL_MIXER_VERSION) && \
+	 patch -Np1 -i ../$(SDL_MIXER_VERSION).patch && \
+	 ./autogen.sh &&\
+     ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static \
+	 --disable-music-cmd --enable-music-wave --enable-music-midi --enable-music-mod --enable-music-mp3-mad-gpl --enable-music-ogg --enable-music-ogg-tremor 
+	@$(MAKE) -C $(SDL_MIXER_VERSION)
+
+$(SDL_NET): $(SDL_NET_SRC)
+	@[ -d $(SDL_NET_VERSION) ] || tar -xzf $<
+	@cd $(SDL_NET_VERSION) && \
+	 patch -Np1 -i ../$(SDL_NET_VERSION).patch && \
+	 ./autogen.sh &&\
+	 ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static
+	@$(MAKE) -C $(SDL_NET_VERSION)
+
+$(SDL_GFX): $(SDL_GFX_SRC)
+	@[ -d $(SDL_GFX_VERSION) ] || tar -xzf $<
+	@cd $(SDL_GFX_VERSION) && \
+	 cp ../SDL_gfx_Makefile Makefile
+#	 ./autogen.sh &&\
+#	 ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static
+	@$(MAKE) -C $(SDL_GFX_VERSION)
+
+$(SDL_SOUND): $(SDL_SOUND_SRC)
+	@[ -d $(SDL_SOUND_VERSION) ] || tar -xzf $<
+	@cd $(SDL_SOUND_VERSION) && \
+	 ./configure --prefix=$(PORTLIBS_PATH)/3ds --host=arm-none-eabi --disable-shared --enable-static
+	@$(MAKE) -C $(SDL_SOUND_VERSION)
+
 install-$(ZLIB):
 	@$(MAKE) -C $(ZLIB_VERSION) install
 
@@ -355,6 +465,12 @@ install:
 	@[ ! -d $(TREMOR_VERSION) ] || $(MAKE) -C $(TREMOR_VERSION) install
 	@[ ! -d $(MIKMOD_VERSION) ] || $(MAKE) -C $(MIKMOD_VERSION) install
 	@[ ! -d $(XZ_VERSION) ] || $(MAKE) -C $(XZ_VERSION) install
+	@[ ! -d $(SDL_TTF_VERSION) ] || $(MAKE) -C $(SDL_TTF_VERSION) install
+	@[ ! -d $(SDL_IMAGE_VERSION) ] || $(MAKE) -C $(SDL_IMAGE_VERSION) install
+	@[ ! -d $(SDL_MIXER_VERSION) ] || $(MAKE) -C $(SDL_MIXER_VERSION) install
+	@[ ! -d $(SDL_NET_VERSION) ] || $(MAKE) -C $(SDL_NET_VERSION) install
+	@[ ! -d $(SDL_GFX_VERSION) ] || $(MAKE) -C $(SDL_GFX_VERSION) install
+	@[ ! -d $(SDL_SOUND_VERSION) ] || $(MAKE) -C $(SDL_SOUND_VERSION) install
 
 clean:
 	@$(RM) -r $(BZIP2_VERSION)
@@ -375,3 +491,9 @@ clean:
 	@$(RM) -r $(XZ_VERSION)
 	@$(RM) -r $(MIKMOD_VERSION)
 	@$(RM) -r $(ZLIB_VERSION)
+	@$(RM) -r $(SDL_TTF_VERSION)
+	@$(RM) -r $(SDL_IMAGE_VERSION)
+	@$(RM) -r $(SDL_MIXER_VERSION)
+	@$(RM) -r $(SDL_NET_VERSION)
+	@$(RM) -r $(SDL_GFX_VERSION)
+	@$(RM) -r $(SDL_SOUND_VERSION)	
